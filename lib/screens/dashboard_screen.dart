@@ -23,7 +23,10 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 // Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -36,7 +39,8 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () => Navigator.pushNamed(context, '/settings'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/settings'),
                         icon: Icon(
                           Symbols.settings,
                           color: isDark ? Colors.white60 : Colors.black54,
@@ -51,12 +55,18 @@ class DashboardScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                      color: isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.black.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const TextField(
                       decoration: InputDecoration(
-                        icon: Icon(Symbols.search, size: 20, color: Colors.grey),
+                        icon: Icon(
+                          Symbols.search,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
                         hintText: 'Search reminders...',
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -68,12 +78,23 @@ class DashboardScreen extends StatelessWidget {
                 // List
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    itemCount: reminderProvider.reminders.length + 1, // +1 for the promotion card
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
+                    ),
+                    itemCount:
+                        reminderProvider.reminders.length +
+                        1, // +1 for the promotion card
                     itemBuilder: (context, index) {
                       if (index < reminderProvider.reminders.length) {
                         final reminder = reminderProvider.reminders[index];
-                        return _buildReminderCard(context, reminder, isDark, settings.primaryColor, reminderProvider);
+                        return _buildReminderCard(
+                          context,
+                          reminder,
+                          isDark,
+                          settings.primaryColor,
+                          reminderProvider,
+                        );
                       } else {
                         return _buildPromotionCard(settings.primaryColor);
                       }
@@ -100,7 +121,13 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReminderCard(BuildContext context, Reminder reminder, bool isDark, Color primary, ReminderProvider provider) {
+  Widget _buildReminderCard(
+    BuildContext context,
+    Reminder reminder,
+    bool isDark,
+    Color primary,
+    ReminderProvider provider,
+  ) {
     String dateStr = DateFormat('MMM d').format(reminder.startDate);
     String timeStr = reminder.startTime.format(context);
 
@@ -112,7 +139,9 @@ class DashboardScreen extends StatelessWidget {
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
           ),
           boxShadow: [
             if (!isDark)
@@ -128,7 +157,11 @@ class DashboardScreen extends StatelessWidget {
             // Delete Button
             IconButton(
               onPressed: () => provider.removeReminder(reminder.id),
-              icon: const Icon(Symbols.delete, color: Colors.redAccent, size: 20),
+              icon: const Icon(
+                Symbols.delete,
+                color: Colors.redAccent,
+                size: 20,
+              ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -162,7 +195,10 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: reminder.categoryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -200,16 +236,16 @@ class DashboardScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: reminder.isCompleted 
-                      ? primary 
-                      : (isDark ? Colors.white24 : Colors.black12),
+                    color: reminder.isCompleted
+                        ? primary
+                        : (isDark ? Colors.white24 : Colors.black12),
                     width: 2,
                   ),
                   color: reminder.isCompleted ? primary : Colors.transparent,
                 ),
-                child: reminder.isCompleted 
-                  ? const Icon(Icons.check, size: 16, color: Colors.white) 
-                  : null,
+                child: reminder.isCompleted
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : null,
               ),
             ),
           ],
@@ -244,12 +280,9 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4),
-              const Text(
+              Text(
                 'Organize your reminders automatically based on location and time.',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),

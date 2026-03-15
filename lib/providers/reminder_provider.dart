@@ -136,7 +136,10 @@ class ReminderProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void _scheduleReminderNotification(Reminder reminder) {
+  void _scheduleReminderNotification(Reminder reminder) async {
+    final prefs = await SharedPreferences.getInstance();
+    final sound = prefs.getString('notificationSound') ?? 'Default';
+
     DateTime scheduledDate = DateTime(
       reminder.startDate.year,
       reminder.startDate.month,
@@ -169,6 +172,7 @@ class ReminderProvider with ChangeNotifier {
       body: 'It\'s time for your ${reminder.frequencyText.toLowerCase()} task!',
       scheduledDate: scheduledDate,
       matchDateTimeComponents: matchComponents,
+      sound: sound,
     );
   }
 }

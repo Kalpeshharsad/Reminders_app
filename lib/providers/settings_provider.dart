@@ -12,6 +12,7 @@ class SettingsProvider with ChangeNotifier {
   bool _showOnLockScreen = true;
   bool _showInHistory = true;
   bool _showAsBanners = true;
+  String _notificationSound = 'Default';
 
   ThemeMode get themeMode => _themeMode;
   Color get primaryColor => _primaryColor;
@@ -21,6 +22,7 @@ class SettingsProvider with ChangeNotifier {
   bool get showOnLockScreen => _showOnLockScreen;
   bool get showInHistory => _showInHistory;
   bool get showAsBanners => _showAsBanners;
+  String get notificationSound => _notificationSound;
 
   SettingsProvider() {
     _loadSettings();
@@ -48,6 +50,7 @@ class SettingsProvider with ChangeNotifier {
     _showOnLockScreen = prefs.getBool('showOnLockScreen') ?? true;
     _showInHistory = prefs.getBool('showInHistory') ?? true;
     _showAsBanners = prefs.getBool('showAsBanners') ?? true;
+    _notificationSound = prefs.getString('notificationSound') ?? 'Default';
 
     notifyListeners();
   }
@@ -106,5 +109,12 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('showAsBanners', enabled);
+  }
+
+  void setNotificationSound(String sound) async {
+    _notificationSound = sound;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('notificationSound', sound);
   }
 }

@@ -38,25 +38,35 @@ class NotificationService {
     required String body,
     required DateTime scheduledDate,
     required DateTimeComponents? matchDateTimeComponents,
+    String? sound,
   }) async {
+    final iosSound = (sound != null && sound != 'Default') ? '${sound.toLowerCase()}.aiff' : null;
+    final androidSound = (sound != null && sound != 'Default') ? RawResourceAndroidNotificationSound(sound.toLowerCase()) : null;
+
+    final darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      sound: iosSound,
+    );
+
+    final androidDetails = AndroidNotificationDetails(
+      'reminders_channel',
+      'Reminders',
+      channelDescription: 'Notifications for your reminders',
+      importance: Importance.max,
+      priority: Priority.high,
+      sound: androidSound,
+    );
+
     await _notificationsPlugin.zonedSchedule(
       id,
       title,
       body,
       tz.TZDateTime.from(scheduledDate, tz.local),
-      const NotificationDetails(
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-        android: AndroidNotificationDetails(
-          'reminders_channel',
-          'Reminders',
-          channelDescription: 'Notifications for your reminders',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
+      NotificationDetails(
+        iOS: darwinDetails,
+        android: androidDetails,
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,

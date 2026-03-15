@@ -38,7 +38,7 @@ class NotificationSettingsScreen extends StatelessWidget {
             _buildSection(context, 'REPETITION & SOUND', [
               _buildToggleItem('Daily Digest', Symbols.summarize, Colors.blue, settings.dailyDigest, isDark, primary, (val) => settings.toggleDailyDigest(val)),
               _buildToggleItem('Critical Alerts', Symbols.priority_high, Colors.red, settings.criticalAlerts, isDark, primary, (val) => settings.toggleCriticalAlerts(val)),
-              _buildSoundSelection(context, primary, isDark),
+              _buildSoundSelection(context, primary, isDark, settings),
             ]),
             const SizedBox(height: 24),
             _buildSection(context, 'ALERTS', [
@@ -121,10 +121,43 @@ class NotificationSettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSoundSelection(BuildContext context, Color primary, bool isDark) {
+  Widget _buildSoundSelection(BuildContext context, Color primary, bool isDark, SettingsProvider settings) {
     return InkWell(
       onTap: () {
-        // Show sound selection dialog or screen
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+          builder: (context) {
+            final sounds = ['Default', 'Chime', 'Bell', 'Alert', 'Synth'];
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Notification Sound', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  const Divider(height: 1),
+                  ...sounds.map((sound) {
+                    final isSelected = settings.notificationSound == sound;
+                    return ListTile(
+                      title: Text(
+                        sound, 
+                        style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                      ),
+                      trailing: isSelected ? Icon(Icons.check, color: primary) : null,
+                      onTap: () {
+                        settings.setNotificationSound(sound);
+                        Navigator.pop(context);
+                      },
+                    );
+                  }),
+                ],
+              ),
+            );
+          },
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -140,12 +173,12 @@ class NotificationSettingsScreen extends StatelessWidget {
                 color: Colors.purple,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Symbols.volume_up, color: Colors.white, size: 20),
+              child: const Icon(Symbols.volume_up, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 12),
             const Text('Notification Sound', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const Spacer(),
-            const Text('Default (Glass)', style: TextStyle(color: Colors.grey, fontSize: 14)),
+            Text(settings.notificationSound, style: const TextStyle(color: Colors.grey, fontSize: 14)),
             const SizedBox(width: 4),
             const Icon(Symbols.chevron_right, color: Colors.grey),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:intl/intl.dart';
 import '../providers/reminder_provider.dart';
 import '../providers/settings_provider.dart';
 
@@ -100,6 +101,9 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildReminderCard(BuildContext context, Reminder reminder, bool isDark, Color primary, ReminderProvider provider) {
+    String dateStr = DateFormat('MMM d').format(reminder.startDate);
+    String timeStr = reminder.startTime.format(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
@@ -176,7 +180,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Next: ${reminder.startTime.format(context)}',
+                    'Next: $dateStr at $timeStr',
                     style: TextStyle(
                       fontSize: 11,
                       color: isDark ? Colors.white38 : Colors.black38,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:intl/intl.dart';
 import '../providers/reminder_provider.dart';
 import '../providers/settings_provider.dart';
 
@@ -15,6 +16,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
   final TextEditingController _controller = TextEditingController();
   Frequency _selectedFrequency = Frequency.hourly;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
         centerTitle: true,
         actions: [
           TextButton(
-            onPressed: _saveReminder,
+            onPressed: () => _saveReminder(context),
             child: Text('Save', style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
@@ -51,8 +53,8 @@ class _AddEditScreenState extends State<AddEditScreen> {
             _buildSectionLabel('Frequency'),
             _buildFrequencyGrid(isDark, primary),
             const SizedBox(height: 32),
-            _buildSectionLabel('Start Time'),
-            _buildTimePicker(isDark, primary),
+            _buildSectionLabel('Schedule'),
+            _buildDateTimePicker(isDark, primary),
             const SizedBox(height: 32),
             _buildSummaryCard(isDark, primary),
             const SizedBox(height: 40),
@@ -138,7 +140,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     );
   }
 
-  Widget _buildTimePicker(bool isDark, Color primary) {
+  Widget _buildDateTimePicker(bool isDark, Color primary) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -146,35 +148,74 @@ class _AddEditScreenState extends State<AddEditScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Symbols.schedule, color: primary),
-              const SizedBox(width: 12),
-              const Text('Alert Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Row(
+                children: [
+                  Icon(Symbols.calendar_today, color: primary),
+                  const SizedBox(width: 12),
+                  const Text('Start Date', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                ],
+              ),
+              GestureDetector(
+                onTap: () async {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2101),
+                  );
+                  if (picked != null) setState(() => _selectedDate = picked);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    DateFormat('MMM d, yyyy').format(_selectedDate),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
-          GestureDetector(
-            onTap: () async {
-              final TimeOfDay? picked = await showTimePicker(
-                context: context,
-                initialTime: _selectedTime,
-              );
-              if (picked != null) setState(() => _selectedTime = picked);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Symbols.schedule, color: primary),
+                  const SizedBox(width: 12),
+                  const Text('Alert Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                ],
               ),
-              child: Text(
-                _selectedTime.format(context),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: () async {
+                  final TimeOfDay? picked = await showTimePicker(
+                    context: context,
+                    initialTime: _selectedTime,
+                  );
+                  if (picked != null) setState(() => _selectedTime = picked);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _selectedTime.format(context),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -204,7 +245,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'You will receive an alert starting today at ${_selectedTime.format(context)}, repeating ${_getFrequencyLabel(_selectedFrequency).toLowerCase()}.',
+                  'Repeating ${_getFrequencyLabel(_selectedFrequency).toLowerCase()} starting ${DateFormat('MMM d').format(_selectedDate)} at ${_selectedTime.format(context)}.',
                   style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                 ),
               ],
@@ -219,7 +260,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _saveReminder,
+        onPressed: () => _saveReminder(context),
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
@@ -246,7 +287,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     }
   }
 
-  void _saveReminder() {
+  void _saveReminder(BuildContext context) {
     if (_controller.text.isEmpty) return;
 
     final reminder = Reminder(
@@ -254,6 +295,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
       title: _controller.text,
       frequency: _selectedFrequency,
       startTime: _selectedTime,
+      startDate: _selectedDate,
     );
 
     Provider.of<ReminderProvider>(context, listen: false).addReminder(reminder);

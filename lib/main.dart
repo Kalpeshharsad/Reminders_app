@@ -7,8 +7,16 @@ import 'screens/dashboard_screen.dart';
 import 'screens/add_edit_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/notification_settings_screen.dart';
+import 'services/notification_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Notification Service
+  final notificationService = NotificationService();
+  await notificationService.init();
+  await notificationService.requestIOSPermissions();
+
   runApp(
     MultiProvider(
       providers: [
@@ -26,29 +34,27 @@ class RemindersApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
-    
+
     return MaterialApp(
-      title: 'Reminders',
+      title: 'Reminders App',
       debugShowCheckedModeBanner: false,
       themeMode: settings.themeMode,
       theme: ThemeData(
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: settings.primaryColor,
-          primary: settings.primaryColor,
+          brightness: Brightness.light,
         ),
-        useMaterial3: true,
-        fontFamily: 'Inter',
+        brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: settings.primaryColor,
-          primary: settings.primaryColor,
           brightness: Brightness.dark,
-          surface: const Color(0xFF101922),
         ),
-        scaffoldBackgroundColor: const Color(0xFF101922),
-        useMaterial3: true,
-        fontFamily: 'Inter',
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
       ),
       initialRoute: '/',
       routes: {

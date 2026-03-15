@@ -129,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Alex Johnson', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                Text('Kalpesh Harsad', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 Text('Apple ID, iCloud, Media & Purchases', style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
@@ -227,7 +227,7 @@ class SettingsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: const EdgeInsets.only(left: 20, bottom: 8),
           child: Text('THEME COLOR', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
         ),

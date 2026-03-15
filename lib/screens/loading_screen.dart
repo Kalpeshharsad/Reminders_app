@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import '../app_theme.dart';
+import '../providers/settings_provider.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -33,8 +34,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final primary = settings.primaryColor;
+
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: const Color(0xFF101922),
       body: Stack(
         children: [
           // Content
@@ -47,15 +51,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   width: 128,
                   height: 128,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [AppTheme.primary, Color(0xFF1E3A8A)],
+                      colors: [primary, primary.withOpacity(0.6)],
                     ),
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primary.withOpacity(0.3),
+                        color: primary.withOpacity(0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -112,8 +116,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                     ),
                     Text(
                       '${(_progress * 100).toInt()}%',
-                      style: const TextStyle(
-                        color: AppTheme.primary,
+                      style: TextStyle(
+                        color: primary,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
@@ -126,17 +130,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   child: LinearProgressIndicator(
                     value: _progress,
                     backgroundColor: Colors.white.withOpacity(0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(primary),
                     minHeight: 6,
                   ),
                 ),
                 const SizedBox(height: 24),
-                const SizedBox(
+                SizedBox(
                   width: 32,
                   height: 32,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                    valueColor: AlwaysStoppedAnimation<Color>(primary),
                   ),
                 ),
               ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../providers/reminder_provider.dart';
-import '../app_theme.dart';
+import '../providers/settings_provider.dart';
 
 class AddEditScreen extends StatefulWidget {
   const AddEditScreen({super.key});
@@ -18,7 +18,9 @@ class _AddEditScreenState extends State<AddEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = settings.primaryColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +28,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
         elevation: 0,
         leading: TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel', style: TextStyle(color: AppTheme.primary, fontSize: 16)),
+          child: Text('Cancel', style: TextStyle(color: primary, fontSize: 16)),
         ),
         leadingWidth: 80,
         title: const Text('Add Reminder', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -34,7 +36,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
         actions: [
           TextButton(
             onPressed: _saveReminder,
-            child: const Text('Save', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text('Save', style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
       ),
@@ -47,14 +49,14 @@ class _AddEditScreenState extends State<AddEditScreen> {
             _buildDescriptionField(isDark),
             const SizedBox(height: 32),
             _buildSectionLabel('Frequency'),
-            _buildFrequencyGrid(isDark),
+            _buildFrequencyGrid(isDark, primary),
             const SizedBox(height: 32),
             _buildSectionLabel('Start Time'),
-            _buildTimePicker(isDark),
+            _buildTimePicker(isDark, primary),
             const SizedBox(height: 32),
-            _buildSummaryCard(isDark),
+            _buildSummaryCard(isDark, primary),
             const SizedBox(height: 40),
-            _buildActionButton(),
+            _buildActionButton(primary),
             const SizedBox(height: 20),
           ],
         ),
@@ -80,7 +82,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
   Widget _buildDescriptionField(bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.cardDark : Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
       ),
@@ -96,7 +98,7 @@ class _AddEditScreenState extends State<AddEditScreen> {
     );
   }
 
-  Widget _buildFrequencyGrid(bool isDark) {
+  Widget _buildFrequencyGrid(bool isDark, Color primary) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -104,11 +106,11 @@ class _AddEditScreenState extends State<AddEditScreen> {
       childAspectRatio: 3,
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      children: Frequency.values.map((f) => _buildFrequencyChip(f, isDark)).toList(),
+      children: Frequency.values.map((f) => _buildFrequencyChip(f, isDark, primary)).toList(),
     );
   }
 
-  Widget _buildFrequencyChip(Frequency frequency, bool isDark) {
+  Widget _buildFrequencyChip(Frequency frequency, bool isDark, Color primary) {
     final isSelected = _selectedFrequency == frequency;
     final label = _getFrequencyLabel(frequency);
 
@@ -118,17 +120,17 @@ class _AddEditScreenState extends State<AddEditScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected 
-              ? AppTheme.primary.withOpacity(0.1) 
-              : (isDark ? AppTheme.cardDark : Colors.white),
+              ? primary.withOpacity(0.1) 
+              : (isDark ? const Color(0xFF1E293B) : Colors.white),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppTheme.primary : (isDark ? Colors.white10 : Colors.black12),
+            color: isSelected ? primary : (isDark ? Colors.white10 : Colors.black12),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppTheme.primary : (isDark ? Colors.white60 : Colors.black54),
+            color: isSelected ? primary : (isDark ? Colors.white60 : Colors.black54),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -136,22 +138,22 @@ class _AddEditScreenState extends State<AddEditScreen> {
     );
   }
 
-  Widget _buildTimePicker(bool isDark) {
+  Widget _buildTimePicker(bool isDark, Color primary) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppTheme.cardDark : Colors.white,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white10 : Colors.black12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Symbols.schedule, color: AppTheme.primary),
-              SizedBox(width: 12),
-              Text('Alert Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Icon(Symbols.schedule, color: primary),
+              const SizedBox(width: 12),
+              const Text('Alert Time', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             ],
           ),
           GestureDetector(
@@ -179,18 +181,18 @@ class _AddEditScreenState extends State<AddEditScreen> {
     );
   }
 
-  Widget _buildSummaryCard(bool isDark) {
+  Widget _buildSummaryCard(bool isDark, Color primary) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.primary.withOpacity(0.05),
+        color: primary.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primary.withOpacity(0.2)),
+        border: Border.all(color: primary.withOpacity(0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Symbols.info, color: AppTheme.primary, size: 20),
+          Icon(Symbols.info, color: primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -213,18 +215,18 @@ class _AddEditScreenState extends State<AddEditScreen> {
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(Color primary) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: _saveReminder,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primary,
+          backgroundColor: primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 18),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 4,
-          shadowColor: AppTheme.primary.withOpacity(0.4),
+          shadowColor: primary.withOpacity(0.4),
         ),
         child: const Text('Set Reminder', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       ),

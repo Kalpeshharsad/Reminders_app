@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../providers/reminder_provider.dart';
-import '../app_theme.dart';
+import '../providers/settings_provider.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<ReminderProvider>(context);
+    final reminderProvider = Provider.of<ReminderProvider>(context);
+    final settings = Provider.of<SettingsProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -67,13 +68,13 @@ class DashboardScreen extends StatelessWidget {
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    itemCount: provider.reminders.length + 1, // +1 for the promotion card
+                    itemCount: reminderProvider.reminders.length + 1, // +1 for the promotion card
                     itemBuilder: (context, index) {
-                      if (index < provider.reminders.length) {
-                        final reminder = provider.reminders[index];
-                        return _buildReminderCard(context, reminder, isDark);
+                      if (index < reminderProvider.reminders.length) {
+                        final reminder = reminderProvider.reminders[index];
+                        return _buildReminderCard(context, reminder, isDark, settings.primaryColor, reminderProvider);
                       } else {
-                        return _buildPromotionCard();
+                        return _buildPromotionCard(settings.primaryColor);
                       }
                     },
                   ),
@@ -85,8 +86,8 @@ class DashboardScreen extends StatelessWidget {
               right: 24,
               bottom: 40,
               child: FloatingActionButton(
-                onPressed: () => Navigator.pushNamed(context, '/add'),
-                backgroundColor: AppTheme.primary,
+                onPressed: () => Navigator.pushNamed(context, '/add_edit'),
+                backgroundColor: settings.primaryColor,
                 elevation: 4,
                 shape: const CircleBorder(),
                 child: const Icon(Symbols.add, color: Colors.white, size: 32),
@@ -98,13 +99,13 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReminderCard(BuildContext context, Reminder reminder, bool isDark) {
+  Widget _buildReminderCard(BuildContext context, Reminder reminder, bool isDark, Color primary, ReminderProvider provider) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? AppTheme.cardDark : Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
@@ -120,9 +121,17 @@ class DashboardScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Delete Button
+            IconButton(
+              onPressed: () => provider.removeReminder(reminder.id),
+              icon: const Icon(Symbols.delete, color: Colors.redAccent, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            const SizedBox(width: 8),
             Container(
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: reminder.categoryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -130,10 +139,10 @@ class DashboardScreen extends StatelessWidget {
               child: Icon(
                 _getIconForReminder(reminder.title),
                 color: reminder.categoryColor,
-                size: 24,
+                size: 22,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,12 +153,12 @@ class DashboardScreen extends StatelessWidget {
                       Text(
                         reminder.title,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: reminder.categoryColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -157,7 +166,7 @@ class DashboardScreen extends StatelessWidget {
                         child: Text(
                           reminder.frequencyText,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: reminder.categoryColor,
                           ),
@@ -169,7 +178,7 @@ class DashboardScreen extends StatelessWidget {
                   Text(
                     'Next: ${reminder.startTime.format(context)}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: isDark ? Colors.white38 : Colors.black38,
                     ),
                   ),
@@ -179,7 +188,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(width: 12),
             GestureDetector(
               onTap: () {
-                Provider.of<ReminderProvider>(context, listen: false).toggleReminder(reminder.id);
+                provider.toggleReminder(reminder.id);
               },
               child: Container(
                 width: 24,
@@ -188,11 +197,11 @@ class DashboardScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: reminder.isCompleted 
-                      ? AppTheme.primary 
+                      ? primary 
                       : (isDark ? Colors.white24 : Colors.black12),
                     width: 2,
                   ),
-                  color: reminder.isCompleted ? AppTheme.primary : Colors.transparent,
+                  color: reminder.isCompleted ? primary : Colors.transparent,
                 ),
                 child: reminder.isCompleted 
                   ? const Icon(Icons.check, size: 16, color: Colors.white) 
@@ -205,15 +214,15 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPromotionCard() {
+  Widget _buildPromotionCard(Color primary) {
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 100),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppTheme.primary, Color(0xFF2563EB)],
+          colors: [primary, primary.withBlue(255).withGreen(100)],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -231,7 +240,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 4),
-              Text(
+              const Text(
                 'Organize your reminders automatically based on location and time.',
                 style: TextStyle(
                   color: Colors.white70,

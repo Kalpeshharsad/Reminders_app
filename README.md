@@ -2,7 +2,7 @@
 
 A sleek, intuitive, and modern Flutter application designed to help you stay on top of your daily tasks and routines. Whether it's drinking water, taking vitamins, or hitting the gym, Reminders App ensures you never miss a beat with smart, customizable notifications.
 
-![Reminders App Mockup](assets/mockup.png)
+![Reminders App Screenshot](assets/screenshot.png)
 
 ## ✨ Features
 
